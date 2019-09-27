@@ -1,0 +1,5 @@
+# Ignore output files.
+
+*.o
+*.elf
+*.bin
