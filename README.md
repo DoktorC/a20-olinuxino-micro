@@ -7,6 +7,11 @@ Currently, all the programs are run after u-boot board initialization.
 You can download the bare-metal GNU toolchain (Cortex-A family) directly from
 [developer.arm.com](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-a/downloads)
 
+## Configure
+If you already have the toolchain's directory in your `PATH`, you're good to go.
+Otherwise, you have to specify the directory in the `DIR` variable of the top-level
+Makefile.
+
 ## How to build
 A top-level Makefile manages the building of each program.
 
