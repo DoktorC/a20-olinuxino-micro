@@ -5,7 +5,6 @@
   .thumb
 
 blink:
-  .fnstart
   ldr r0, =0x1C20800  @ load PIO base address
   eor r1, r0, 0xFC    @ compute port H CFG0 address
   ldr r0, [r1]        @ load port H CFG0 content
