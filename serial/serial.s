@@ -5,7 +5,6 @@
   .thumb
 
 _start:
-  .fnstart
   sub sp, 0x4
   mov r0, 0x0
   str r0, [sp]
