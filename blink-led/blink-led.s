@@ -23,7 +23,7 @@ turn_on:
   str r0, [r1]
   mov r4, #1          @ "is-turn-on" flag set
 
-set:
+set_delay:
   ldr r3, =#50000000  @ about 1/20 of a second
 
 delay:
@@ -41,4 +41,4 @@ turn_off:
   and r0, r0, r2
   str r0, [r1]
   mov r4, #0          @ "is-turn-on" flag cleared
-  b set
+  b set_delay
