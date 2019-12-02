@@ -24,7 +24,7 @@ turn_on:
   mov r4, #1          @ "is-turn-on" flag set
 
 set:
-  ldr r3, =#50000000
+  ldr r3, =#50000000  @ about 1/20 of a second
 
 delay:
   sub r3, #1
