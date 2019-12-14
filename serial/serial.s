@@ -66,7 +66,7 @@ exit:
   cmp r5, r6          @ read entire message?
   bne turn_on_led
   add sp, 0x4
-  b loop
+  bx lr
 
 turn_on_led:
   ldr r0, =0x1C20800  @ load PIO base address
@@ -90,9 +90,6 @@ turn_off_led:
   ldr r2, =#50000000
   mov r7, 0x0         @ "is-turn-on" flag clear
   b delay
-
-loop:
-  b loop
 
 set_counter:
   mov r2, #100        @ Set delay counter
