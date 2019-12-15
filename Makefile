@@ -6,6 +6,8 @@ LD          = $(ARM_PREFIX)-ld.bfd
 OBJDUMP     = $(ARM_PREFIX)-objdump
 OBJCPY      = $(ARM_PREFIX)-objcopy
 
+all: blink-led print_msg
+
 .PHONY: blink-led print_msg
 
 blink-led:
