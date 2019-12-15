@@ -1,4 +1,4 @@
-MAIN  = serial
+MAIN  = print_msg
 SOURCES = $(MAIN)
 OBJECTS   = $(addsuffix .o, $(SOURCES))
 
