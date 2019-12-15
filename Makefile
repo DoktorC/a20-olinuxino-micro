@@ -6,14 +6,14 @@ LD          = $(ARM_PREFIX)-ld.bfd
 OBJDUMP     = $(ARM_PREFIX)-objdump
 OBJCPY      = $(ARM_PREFIX)-objcopy
 
-.PHONY: blink-led serial
+.PHONY: blink-led print_msg
 
 blink-led:
 	@make -C $@ AS=$(AS) LD=$(LD) OBJCPY=$(OBJCPY) $@
 
-serial:
+print_msg:
 	@make -C $@ AS=$(AS) LD=$(LD) OBJCPY=$(OBJCPY) $@
 
 clean:
 	@make -C blink-led clean
-	@make -C serial clean
+	@make -C print_msg clean
