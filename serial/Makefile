@@ -1,4 +1,6 @@
 MAIN  = serial
+SOURCES = $(MAIN)
+OBJECTS   = $(addsuffix .o, $(SOURCES))
 
 CXX    ?= arm-eabi-gcc
 AS 		 ?= arm-eabi-as
@@ -8,20 +10,20 @@ OBJCPY ?= arm-eabi-objcopy
 RELOC_ADDR ?= 0x0
 LDFLAGS		 ?= -Ttext=$(RELOC_ADDR)
 
-.PHONY: serial
+.PHONY: $(SOURCES)
 
 $(MAIN): $(MAIN).bin
 
 $(MAIN).bin: $(MAIN).elf
 	$(OBJCPY) -O binary $< $@
 
-$(MAIN).elf: $(MAIN).o
-	$(LD) $(LDFLAGS) $< -o $@
+$(MAIN).elf: $(OBJECTS)
+	$(LD) $(LDFLAGS) $^ -o $@
 
-$(MAIN).o:
+%.o:
 	$(AS) -mcpu=cortex-a7 -mthumb $(patsubst %.o,%.s,$@) -o $@
 
 clean:
-	rm -rf $(MAIN).o
+	rm -rf $(OBJECTS)
 	rm -rf $(MAIN).elf
 	rm -rf $(MAIN).bin

@@ -1,99 +1,60 @@
   .syntax unified
   .cpu cortex-a7
+  .text
   .global _start
   .type _start, %function
   .thumb
 
 _start:
-  sub sp, 0x4
-  mov r0, 0x0
-  str r0, [sp]
-  ldr r0, =0x1C28000  @ load UART0 base address
-  mov r2, 0x14        @ UART_LSR offset
-  add r3, r0, r2      @ UART_LSR address
-  adr r4, msg         @ load addr of message to print
-  mov r5, 0x14        @ message's length
-  mov r6, 0x0         @ current char
-  b config_led
+  push {lr}
+  adr r2, .UART0
+  ldr r2, [r2]        @ load UART0 base address
+  adr r3, .UART0_LSR
+  ldr r3, [r3]        @ cache LSR's content
+  adr r4, .MSG        @ load addr of message to print
+  mov r5, 0x14        @ msg's length
 
-config_led:
-  ldr r0, =0x1C20800  @ load PIO base address
-  eor r1, r0, 0xFC    @ compute port H CFG0 address
-  ldr r0, [r1]        @ load port H CFG0 content
-  mov r2, #1          @ configure as output
-  lsl r2, #8
-  eor r0, r0, r2
-  str r0, [r1]        @ record configuration
-  ldr r0, =0x1C20800  @ load PIO base address
-  eor r1, r0, 0x10C   @ compute port H data reg address
-  mov r7, 0x0         @ "is-led-on" flag clear
-  b check_end_tx
+.LOOP:
+  beq .EPILOGUE       @ r5 == 0x00?
 
-delay:
-  sub r2, #1
-  cmp r2, #0
-  bne delay
-  cmp r7, 0x0         @ is led turn on?
-  bne turn_off_led
+.CHECK_TX:
+  bl  .EMPTY_TX
+  bne .PRINT
+  bl  .DELAY
+  b   .CHECK_TX
 
-check_end_tx:
-  ldr r2, [r3]        @ Load UART_LSR content
-  mov r1, #1          @ Check "TX Holding Register Empty"
-  lsl r1, #5
-  and r1, r2, r1
+.PRINT:
+  ldrb r0, [r4], 0x01
+  strb r0, [r2]        @ write char
+  subs r5, 0x01
+  b    .LOOP
 
-send:
-  lsr r1, #5
-  cmp r1, #1          @ TXHR empty?
-  bne set_counter
-  ldr r1, [r4]        @ get chunk
-  mov r0, 0x0
-  b read_chunk
+.EMPTY_TX:
+  ldr r0, [r3]        @ load UART_LSR content
+  lsr r0, 0x05
+  mov r1, 0x01        @ check "TX Holding Register" empty
+  ands r0, r1
+  bx  lr
 
-read_chunk:
-  add r0, 0x1
-  str r0, [sp]
-  ldr r0, =0x1C28000  @ load UART0 base address
-  str r1, [r0]        @ write char
-  lsr r1, 0x8         @ next char in chunk
-  ldr r0, [sp]
-  cmp r0, 0x4
-  bne read_chunk
-  add r4, 0x4         @ next chunk
-  add r6, 0x4
+.DELAY:
+  ldr r6, =0x1000
 
-exit:
-  cmp r5, r6          @ read entire message?
-  bne turn_on_led
-  add sp, 0x4
-  bx lr
+.DELAY_LOOP:
+  subs r6, 0x01
+  bne .DELAY_LOOP     @ r6 == 0x00?
+  bx  lr
 
-turn_on_led:
-  ldr r0, =0x1C20800  @ load PIO base address
-  eor r1, r0, 0x10C   @ compute port H data reg address
-  ldr r0, [r1]        @ load port H data reg content
-  mov r2, #1          @ turn on the led
-  lsl r2, #2
-  eor r0, r0, r2
-  str r0, [r1]
-  ldr r2, =#50000000
-  mov r7, 0x1         @ "is-led-on" flag set
-  b delay
+.EPILOGUE:
+  mov r0, 0x0A
+  strb r0, [r2]       @ print line-feed/new-line
+  pop {lr}
+  mov r0, r5          @ returns #chars printed
+  bx  lr
 
-turn_off_led:
-  ldr r0, [r1]        @ load port H data reg content
-  mov r2, #1          @ turn off the led
-  lsl r2, #2
-  mvn r2, r2
-  and r0, r0, r2
-  str r0, [r1]
-  ldr r2, =#50000000
-  mov r7, 0x0         @ "is-turn-on" flag clear
-  b delay
-
-set_counter:
-  mov r2, #100        @ Set delay counter
-  b delay
-
-msg:
+.UART0:
+  .word 0x1C28000
+.UART0_LSR:
+  .word 0x1C28014
+.MSG:
   .string "Alan Mathison Turing"
+
