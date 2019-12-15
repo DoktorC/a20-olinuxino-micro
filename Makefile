@@ -1,5 +1,5 @@
 DIR  ?=
-ARM_PREFIX  = $(DIR)/arm-eabi
+ARM_PREFIX  = $(DIR)arm-eabi
 CXX         = $(ARM_PREFIX)-gcc
 AS          = $(ARM_PREFIX)-as
 LD          = $(ARM_PREFIX)-ld.bfd
